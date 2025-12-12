@@ -1,5 +1,5 @@
 import sys, os, tempfile
-import sandbox.util as util
+from . import util
 
 class SandboxedProcess(subprocess.Popen):
   pass
@@ -37,7 +37,7 @@ def run(cmd, id, readable_paths=[], writable_paths=[], writable_paths_ensure_exi
   return proc
 
 def get_python_paths():
-  paths = []
+  paths = set()
   for path in [os.path.dirname(sys.executable), os.path.dirname(os.__file__)]:
     util.add_path_if_unique(paths, path)
-  return paths
+  return list(paths)

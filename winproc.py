@@ -47,7 +47,7 @@ class SandboxedProcess(object):
     self.stderr = self.stdout
 
   def __del__(self):
-    if not kernel32.CloseHandle(self.proc):
+    if hasattr(self, 'proc') and not kernel32.CloseHandle(self.proc):
       raise WinError()
 
   def __repr__(self):

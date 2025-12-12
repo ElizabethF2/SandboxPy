@@ -1,8 +1,8 @@
-import os, subprocess, json, ctypes, hashlib, sys, shutil
+import os, json, ctypes, hashlib, sys, shutil
 from ctypes import wintypes
-import sandbox.wincontainer as wincontainer, sandbox.winproc as winproc
-from sandbox.winproc import SandboxedProcess
-import sandbox.util as util
+from . import wincontainer, winproc
+from .winproc import SandboxedProcess
+from . import util
 
 MAX_APPCONTAINER_NAME = 50
 
@@ -14,9 +14,9 @@ kernel32 = ctypes.windll.kernel32
 INFINITE = 0xFFFFFFFF
 WAIT_FAILED = 0xFFFFFFFF
 
-class WinCrossProcMutex(object):
+class WinCrossProcMutex(object, name = 'Sandbox_py_Global_Mutex'):
   def __enter__(self):
-    handle = kernel32.CreateMutexW(0, False, b'Sandbox_py_Global_Mutex')
+    handle = kernel32.CreateMutexW(0, False, name.encode())
     if not handle:
       raise ctypes.WinError()
 

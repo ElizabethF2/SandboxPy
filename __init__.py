@@ -1,23 +1,42 @@
 import sys, platform
+from . import wasi
 
 if platform.system() == 'Windows':
-  from sandbox.windows import *
+  from .windows import *
 elif platform.system() == 'Linux':
-  from sandbox.linux import *
+  from .linux import *
 elif platform.system() == 'Darwin':
-  from sandbox.osx import *
+  from .osx import *
 elif platform.system() == 'FreeBSD':
-  from sandbox.freebsd import *
+  from .freebsd import *
 else:
-  def run(*args, **kwargs):
-    raise NotImplementedError('Unsupported platform')
-  get_python_paths = run
+  run = wasi.run
+  get_python_paths = lambda: []
 
-def run_python(cmd, id, readable_paths=[], writable_paths=[], writable_paths_ensure_exists=[], env=None, cwd=None):  
-  return run([sys.executable] + cmd,
-             id,
-             readable_paths = get_python_paths() + readable_paths,
-             writable_paths = writable_paths,
-             writable_paths_ensure_exists = writable_paths_ensure_exists,
-             env = env,
-             cwd = cwd)
+def run_python(cmd,
+               id,
+               readable_paths=[],
+               writable_paths=[],
+               writable_paths_ensure_exists=[],
+               env=None,
+               cwd=None,
+               **kwargs):
+  exe = sys.executable
+  if exe and not kwargs.get('force_wasi'):
+    try:
+      return run([os.path.abspath(exe)] + cmd,
+                 id,
+                 readable_paths = get_python_paths() + readable_paths,
+                 writable_paths = writable_paths,
+                 writable_paths_ensure_exists = writable_paths_ensure_exists,
+                 env = env,
+                 cwd = cwd)
+    except FileNotFoundError:
+      pass
+  return wasi.run_python(cmd,
+                         id,
+                         readable_paths = readable_paths,
+                         writable_paths = writable_paths,
+                         writable_paths_ensure_exists = writable_paths_ensure_exists,
+                         env = env,
+                         cwd = cwd)

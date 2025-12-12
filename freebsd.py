@@ -1,5 +1,7 @@
 import sys, os, subprocess, json, glob, tempfile
-import sandbox.util as util
+from . import util
+
+# TODO: rewrite to use non-privileged jails, do cleanup in SandboxedProcess
 
 class SandboxedProcess(subprocess.Popen):
   pass
@@ -43,9 +45,9 @@ def delete_all_sandboxes():
   _send_payload_to_warden(payload, check_return_code=True)
 
 def get_python_paths():
-  paths = ['/libexec', '/usr/lib', '/usr/local/bin', '/usr/local/lib', '/lib']
+  paths = set(['/libexec', '/usr/lib', '/usr/local/bin', '/usr/local/lib', '/lib'])
   for path in glob.iglob('/var/run/ld-elf*.hints'):
     util.add_path_if_unique(paths, path)
   for path in [os.path.dirname(sys.executable), os.path.dirname(os.__file__)]:
     util.add_path_if_unique(paths, path)
-  return paths
+  return list(paths)

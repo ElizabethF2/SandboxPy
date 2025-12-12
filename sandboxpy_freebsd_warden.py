@@ -1,6 +1,10 @@
 TMP_DIR = '/tmp'
 PROXY_DIRS = ['/usr/jails']
 
+# TODO: read config from /etc/sandboxpy.conf, store jails in /tmp and set perms, add excluded_paths regex pattern cfg, check that dirs and mounts with perms are honored after setuid and setgid (gid before uid), use ctypes to load libjail
+
+# TODO check permissions and make sure non-root users can't modify this
+
 # If necessary, the two lines above can be changed to different locations
 # Do not edit any of the lines below
 
